@@ -158,7 +158,7 @@ elif selected == "Predictor":
         recharge_amt = st.number_input("Recharge Amount (XOF)", min_value=0.0, step=100.0)
         recharge_freq = st.number_input("Recharge Frequency", min_value=0.0, step=1.0)
         total_revenue = st.number_input("Total Revenue (XOF)", min_value=0.0, step=100.0)
-        avg_revenue = st.number_input("Average Revenue (XOF)", min_value=0.0, step=100.0)
+        avg_revenue = st.number_input("Average Revenue (XOF) *Total Revenue divided by 3", min_value=0.0, step=100.0)
         frequency = st.number_input("Frequency", min_value=0.0, step=1.0)
         data_volume = st.number_input("Data Volume", min_value=0.0, step=100.0)
         on_net = st.number_input("On-Net Calls", min_value=0.0, step=1.0)

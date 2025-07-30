@@ -76,6 +76,43 @@ scaler = joblib.load('g4_scaler.pkl')
 X_columns = joblib.load('g4_column_names.pkl')
 
 # ------------------------------------------------
+# ENCODING MAPS
+# ------------------------------------------------
+city_map = {
+    'Dakar': 0, 'Saint-Louis': 1, 'Tambacounda': 2, 'Fatick': 3, 'Thies': 4,
+    'Louga': 5, 'Kaffrine': 6, 'Diourbel': 7, 'Kolda': 8, 'Matam': 9,
+    'Sedhiou': 10, 'Kaolack': 11, 'Ziguinchor': 12, 'Kedougou': 13
+}
+
+duration_map = {
+    '24+': 0, '15 - 18': 1, '12 - 15': 2, '21 - 24': 3, '18 - 21': 4,
+    '6 - 9': 5, '9 - 12': 6, '3 - 6': 7
+}
+
+top_pack_list = [
+    'All-net 500F=2000F', '5d, Data: 100 F=40MB,24H', 'All-net 500F=2000F;5d',
+    'On net 200F=Unlimited _call24H', 'Data:490F=1GB,7d', 'Data:1000F=5GB,7d',
+    'VAS(IVR_Radio_Daily)', 'Data:200F=Unlimited,24H', 'Jokko_Daily',
+    'Mixt 250F=Unlimited_call24H', 'Data: 200 F=100MB,24H',
+    'MIXT:500F= 2500F on net _2500F off net;2d', 'Data:1000F=2GB,30d',
+    'IVR Echat_Daily_50F', 'On-net 1000F=10MilF;10d', 'All-net 600F= 3000F ;5d',
+    'Twter_U2opia_Daily', 'MIXT: 200mnoff net _unl on net _5Go;30d',
+    'On-net 500F_FNF;3d', 'Twter_U2opia_Weekly', 'All-net 500F =2000F_AllNet_Unlimited',
+    'Yewouleen_PKG', 'On-net 500=4000,10d', 'On-net 200F=60mn;1d',
+    'Data:3000F=10GB,30d', 'Incoming_Bonus_woma', 'All-net 1000=5000;5d',
+    'Data:500F=2GB,24H', 'Data:300F=100MB,2d', 'MIXT: 390F=04HOn-net_400SMS_400 Mo;4h',
+    'Data:50F=30MB_24H', 'All-net 1000F=(3000F On+3000F Off);5d',
+    'All-net 500F=1250F_AllNet_1250_Onnet;48h', 'Data:150F=SPPackage1,24H',
+    'CVM_on-net bundle 500=5000', 'Data: 200F=1GB,24H', '200=Unlimited1Day',
+    'MROMO_TIMWES_OneDAY', '200F=10mnOnNetValid1H',
+    'On net 200F= 3000F_10Mo ;24H', 'All-net 300=600;2d', 'On-net 300F=1800F;3d',
+    'MIXT: 590F=02H_On-net_200SMS_200 Mo;24h', 'YMGX 100=1 hour FNF, 24H/1 month',
+    '500=Unlimited3Day', 'Data:DailyCycle_Pilot_1.5GB', 'Data:1500F=3GB,30D'
+    # Add more if needed...
+]
+top_pack_map = {name: idx for idx, name in enumerate(top_pack_list)}
+
+# ------------------------------------------------
 # SIDEBAR MENU
 # ------------------------------------------------
 with st.sidebar:
@@ -105,19 +142,19 @@ with st.sidebar:
 # HOME TAB
 # ------------------------------------------------
 if selected == "Home":
-    st.title("📡 Welcome to the Telecom Churn Predictor")
+    st.title("\U0001F4E1 Welcome to the Telecom Churn Predictor")
     st.write("This app predicts whether a telecom customer is likely to churn based on key usage metrics.")
 
 # ------------------------------------------------
 # PREDICTOR TAB
 # ------------------------------------------------
 elif selected == "Predictor":
-    st.title("📈 Predict Customer Churn")
+    st.title("\U0001F4C8 Predict Customer Churn")
     st.write("Enter customer details below:")
 
     with st.form("prediction_form"):
-        city = st.selectbox("City", ['Dakar','Saint-Louis','Tambacounda','Fatick','Thies', 'Louga', 'Kaffrine', 'Diourbel', 'Kolda','Matam', 'Sedhiou', 'Kaolack', 'Ziguinchor', 'Kedougou'])
-        duration = st.selectbox("Duration (Months)", ['24+', '15 - 18', '12 - 15', '21 - 24', '18 - 21', '6 - 9', '9 - 12', '3 - 6'])
+        city = st.selectbox("City", list(city_map.keys()))
+        duration = st.selectbox("Duration (Months)", list(duration_map.keys()))
         recharge_amt = st.number_input("Recharge Amount (XOF)", min_value=0.0, step=100.0)
         recharge_freq = st.number_input("Recharge Frequency", min_value=0.0, step=1.0)
         total_revenue = st.number_input("Total Revenue (XOF)", min_value=0.0, step=100.0)
@@ -128,56 +165,37 @@ elif selected == "Predictor":
         orange = st.number_input("Orange Calls", min_value=0.0, step=1.0)
         tigo = st.number_input("Tigo Calls", min_value=0.0, step=1.0)
         days_active = st.number_input("Days Active", min_value=0, step=1)
-        top_pack = st.selectbox("Top Pack", ['All-net 500F=2000F','5d, Data: 100 F=40MB,24H','All-net 500F=2000F;5d','On net 200F=Unlimited _call24H',
-        'Data:490F=1GB,7d','Data:1000F=5GB,7d','VAS(IVR_Radio_Daily)','Data:200F=Unlimited,24H','Jokko_Daily',
-        'Mixt 250F=Unlimited_call24H','Data: 200 F=100MB,24H','MIXT:500F= 2500F on net _2500F off net;2d',
-        'Data:1000F=2GB,30d','IVR Echat_Daily_50F','On-net 1000F=10MilF;10d','All-net 600F= 3000F ;5d',
-        'Twter_U2opia_Daily','MIXT: 200mnoff net _unl on net _5Go;30d','On-net 500F_FNF;3d','Twter_U2opia_Weekly',
-        'All-net 500F =2000F_AllNet_Unlimited','Yewouleen_PKG','On-net 500=4000,10d','On-net 200F=60mn;1d',
-        'Data:3000F=10GB,30d','Incoming_Bonus_woma','All-net 1000=5000;5d','Data:500F=2GB,24H','Data:300F=100MB,2d',
-        'MIXT: 390F=04HOn-net_400SMS_400 Mo;4h','Data:50F=30MB_24H','All-net 1000F=(3000F On+3000F Off);5d',
-        'All-net 500F=1250F_AllNet_1250_Onnet;48h','Data:150F=SPPackage1,24H','CVM_on-net bundle 500=5000',
-        'Data: 200F=1GB,24H','200=Unlimited1Day','MROMO_TIMWES_OneDAY','200F=10mnOnNetValid1H','On net 200F= 3000F_10Mo ;24H',
-        'All-net 300=600;2d','On-net 300F=1800F;3d','MIXT: 590F=02H_On-net_200SMS_200 Mo;24h',
-        'YMGX 100=1 hour FNF, 24H/1 month','500=Unlimited3Day','Data:DailyCycle_Pilot_1.5GB','Data:1500F=3GB,30D',
-        'New_YAKALMA_4_ALL','Twter_U2opia_Monthly','Jokko_promo','Pilot_Youth4_490','SUPERMAGIK_5000',
-        'On-net 2000f_One_Month_100H; 30d','Jokko_Monthly','Jokko_Weekly','Facebook_MIX_2D','Data: 490F=Night,00H-08H',
-        'Internat: 1000F_Zone_1;24H','FNF2 ( JAPPANTE)','All-net 500F=4000F ; 5d','WIFI_Family_2MBPS','Data:700F=SPPackage1,7d',
-        'Data:700F=1.5GB,7d','Data:30Go_V 30_Days','DataPack_Incoming','MIXT: 500F=75(SMS, ONNET, Mo)_1000FAllNet;24h',
-        'EVC_500=2000F','MIXT:1000F=4250 Off net _ 4250F On net _100Mo; 5d','MROMO_TIMWES_RENEW','All-net 5000= 20000off+20000on;30d',
-        'Pilot_Youth1_290','Data:1500F=SPPackage1,30d','MIXT:10000F=10hAllnet_3Go_1h_Zone3;30d','EVC_Jokko_Weekly',
-        'MIXT: 5000F=80Konnet_20Koffnet_250Mo;30d','WIFI_ Family _4MBPS','Internat: 1000F_Zone_3;24h',
-        'Mixt : 500F=2500Fonnet_2500Foffnet ;5d','FIFA_TS_daily','CVM_100F_unlimited','WIFI_ Family _10MBPS','301765007',
-        'SUPERMAGIK_1000','TelmunCRBT_daily','pilot_offer6','305155009','VAS(IVR_Radio_Monthly)','Staff_CPE_Rent',
-        'IVR Echat_Weekly_200F','1000=Unlimited7Day','FNF_Youth_ESN','EVC_100Mo','Data:New-GPRS_PKG_1500F',
-        'Data_EVC_2Go24H','CVM_100f=200 MB','Internat: 2000F_Zone_2;24H','MIXT: 4900F= 10H on net_1,5Go ;30d',
-        'VAS(IVR_Radio_Weekly)','pilot_offer5','CVM_200f=400MB','APANews_weekly','CVM_500f=2GB',
-        'CVM_On-net 1300f=12500','pack_chinguitel_24h','NEW_CLIR_TEMPALLOWED_LIBERTE_MOBILE',
-        'NEW_CLIR_PERMANENT_LIBERTE_MOBILE','GPRS_3000Equal10GPORTAL','APANews_monthly','200=unlimited pilot auto',
-        'IVR Echat_Monthly_500F','CVM_On-net 400f=2200F','EVC_MEGA10000F'])
+        top_pack = st.selectbox("Top Pack", top_pack_list)
         freq_top_pack = st.number_input("Top Pack Frequency", min_value=0.0, step=1.0)
 
         submit = st.form_submit_button("Predict Churn")
 
     if submit:
-        input_df = pd.DataFrame([[
-            city, duration, recharge_amt, recharge_freq, total_revenue, avg_revenue,
-            frequency, data_volume, on_net, orange, tigo, days_active, top_pack, freq_top_pack
-        ]], columns=X_columns)
+        encoded_city = city_map.get(city, -1)
+        encoded_duration = duration_map.get(duration, -1)
+        encoded_top_pack = top_pack_map.get(top_pack, -1)
 
-        scaled_input = scaler.transform(input_df)
-        prediction = model.predict(scaled_input)[0]
-        probability = model.predict_proba(scaled_input)[0][1]
+        if -1 in (encoded_city, encoded_duration, encoded_top_pack):
+            st.error("⚠️ Encoding failed for one of the categorical values.")
+        else:
+            input_df = pd.DataFrame([[
+                encoded_city, encoded_duration, recharge_amt, recharge_freq,
+                total_revenue, avg_revenue, frequency, data_volume,
+                on_net, orange, tigo, days_active, encoded_top_pack, freq_top_pack
+            ]], columns=X_columns)
 
-        st.markdown("### 🧾 Prediction Result")
-        st.success("✅ Customer is likely to churn" if prediction == 1 else "❌ Customer will not churn")
-        st.metric("Churn Probability", f"{probability:.2%}")
+            scaled_input = scaler.transform(input_df)
+            prediction = model.predict(scaled_input)[0]
+            probability = model.predict_proba(scaled_input)[0][1]
 
-# ------------------------------------------------
+            st.markdown("### \U0001F9FE Prediction Result")
+            st.success("✅ Customer is likely to churn" if prediction == 1 else "❌ Customer will not churn")
+            st.metric("Churn Probability", f"{probability:.2%}")
+            # ------------------------------------------------
 # ABOUT TAB
 # ------------------------------------------------
 elif selected == "About":
-    st.title("📘 About This App")
+    st.title("\U0001F4D8 About This App")
     st.markdown("""
         *Group 4 - Capstone Project (Telecom Customer Churn)*
 
@@ -185,6 +203,6 @@ elif selected == "About":
         - *Accuracy:* 86%  
         - *Dataset:* Expresso Senegal  
         - *Input Features:* Recharge behavior, call volume, revenue, and activity levels  
-        
+
         *Built with ❤️ using:* Python, Streamlit, Scikit-learn, XGBoost
     """)

@@ -116,50 +116,5 @@ elif selected == "Predictor":
     st.write("Enter customer details below:")
 
     with st.form("prediction_form"):
-        city = st.slider("City (Encoded)", 0, 20, 5)
-        duration = st.slider("Duration (Months) (Encoded)", 0, 7, 4)
-
-        recharge_amt = st.number_input("Recharge Amount (XOF)", min_value=0.0, step=100.0)
-        recharge_freq = st.number_input("Recharge Frequency", min_value=0.0, step=1.0)
-        total_revenue = st.number_input("Total Revenue (XOF)", min_value=0.0, step=100.0)
-        avg_revenue = st.number_input("Average Revenue (XOF)", min_value=0.0, step=100.0)
-        frequency = st.number_input("Frequency", min_value=0.0, step=1.0)
-        data_volume = st.number_input("Data Volume", min_value=0.0, step=100.0)
-        on_net = st.number_input("On-Net Calls", min_value=0.0, step=1.0)
-        orange = st.number_input("Orange Calls", min_value=0.0, step=1.0)
-        tigo = st.number_input("Tigo Calls", min_value=0.0, step=1.0)
-        days_active = st.number_input("Days Active", min_value=0, step=1)
-        top_pack = st.slider("Top Pack (Encoded)", 0, 20, 5)
-        freq_top_pack = st.number_input("Top Pack Frequency", min_value=0.0, step=1.0)
-
-        submit = st.form_submit_button("Predict Churn")
-
-    if submit:
-        input_df = pd.DataFrame([[
-            city, duration, recharge_amt, recharge_freq, total_revenue, avg_revenue,
-            frequency, data_volume, on_net, orange, tigo, days_active, top_pack, freq_top_pack
-        ]], columns=X_columns)
-
-        scaled_input = scaler.transform(input_df)
-        prediction = model.predict(scaled_input)[0]
-        probability = model.predict_proba(scaled_input)[0][1]
-
-        st.markdown("### 🧾 Prediction Result")
-        st.success("✅ Customer is likely to churn" if prediction == 1 else "❌ Customer will not churn")
-        st.metric("Churn Probability", f"{probability:.2%}")
-
-# ------------------------------------------------
-# ABOUT TAB
-# ------------------------------------------------
-elif selected == "About":
-    st.title("📘 About This App")
-    st.markdown("""
-        Group 4 - Capstone Project (Telecom Customer Churn)
-
-        - Model: XGBoost (after sampling)  
-        - Accuracy: 86%  
-        - Dataset: Expresso Senegal  
-        - Input Features: Recharge behavior, call volume, revenue, and activity levels  
-        
-        Built with ❤️ using: Python, Streamlit, Scikit-learn, XGBoost
-    """)
+        city = st.selectbox("City (Encoded)", list(range(0, 21)), index=5)
+        duration = st.selectbox("Duration (Months) (Encoded)", list(range(0, 8)), index=4)
